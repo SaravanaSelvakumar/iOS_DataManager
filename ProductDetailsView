@@ -1,0 +1,106 @@
+struct ProductDetailsView: View {
+    @State private var isSearching = false
+    @State private var searchText = ""
+    @Environment(\.presentationMode) var presentationMode
+    @State private var selectedColor = 0
+    @State private var selectedPowerOutput = 0
+    @State private var selectedSize = 0
+    @State private var selectedTab = 0
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                
+                if isSearching {
+                    TextField("Search Products...", text: $searchText)
+                        .keyboardType(.alphabet)
+                        .autocapitalization(.none)
+                        .autocorrectionDisabled()
+                        .padding(8)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(8)
+                        .padding(.horizontal)
+                        .scaleEffect(isSearching ? 1 : 0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isSearching)
+                }
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        TabView {
+                            ForEach(0..<3) { index in
+                                Image("VivoY50")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(height: 250)
+                            }
+                        }
+                        .tabViewStyle(PageTabViewStyle())
+                        .frame(height: 250)
+                        
+                        BottomDivider()
+                            .padding(.top)
+                        
+                        productDeatilHeader()
+                            .padding(.top)
+                            .padding(.horizontal, 8)
+                        
+                        BottomDivider()
+                            .padding(.top)
+                        
+                        // 5. Variants Selection
+                        VStack(alignment: .leading) {
+                            Text("Select Variants")
+                                .font(.custom("Inter-Medium", size: DeviceType(rawValue: DEVICE)!.mediumFontSize))
+                                .lineLimit(1)
+                                .foregroundStyle(Color(hex: "1E2126"))
+                                .padding(.vertical, 3)
+                                .padding(.leading)
+                            
+                            Divider()
+                            
+                            VariantSelector(selectedColor: $selectedColor, selectedPowerOutput: $selectedPowerOutput, selectedSize: $selectedSize)
+                            
+                            Divider()
+                        }
+                        .padding(.top)
+                        .background(.white)
+                        .navigationBarTitle("Products", displayMode: .inline)
+                        .navigationBarBackButtonHidden(true)
+                        /// Custom back button and save button
+                        .toolbar {
+                            /// Back button on the Left side
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button(action: {
+                                    presentationMode.wrappedValue.dismiss()
+                                }) {
+                                    Image(systemName: "chevron.backward")
+                                        .font(.system(size: 14, weight: .bold))
+                                        .foregroundColor(.white)
+                                }
+                                .padding(.bottom, 2)
+                            }
+                            
+                            /// Search button on the right side
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button(action: {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        isSearching.toggle()
+                                    }
+                                    if !isSearching {
+                                        searchText = ""
+                                    }
+                                }) {
+                                    Image(systemName: isSearching ? "xmark" : "magnifyingglass")
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
+                        .onAppear {
+                            setNavigationBarColor()
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
